@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Adventure Works Sales Case Study</title>
+<style>
+:root{
+ --color-fg:#1f2430;--color-fg-muted:#5b6475;--color-bg:#f6f7f9;--color-panel:#ffffff;--color-border-line:#dde1e8;--color-bad:#c0392b;
+ --font-anthropic-sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;--font-anthropic-serif:Georgia,"Times New Roman",serif;
+ --cds-gap-xs:.25rem;--cds-gap-sm:.5rem;--cds-gap-md:1rem;--cds-gap-xl:2rem;
+ --cds-pad-xs:.25rem;--cds-pad-sm:.5rem;--cds-pad-md:1rem;--cds-pad-lg:1.25rem;--cds-radius:10px;
+ --cds-font-size-caption:.78rem;--cds-font-size-body:.95rem;--cds-font-size-heading:1.1rem;--cds-font-size-title:1.9rem;--cds-font-weight-medium:600;
+ --cds-chart-muted:#b7bfcc;--cds-chart-grid:#e3e7ee;--cds-chart-reference:#8a93a3;
+ --cds-surface-popover:#ffffff;--cds-border:#cfd5df;--cds-shadow-popover:0 4px 14px rgba(20,30,50,.15);--cds-text-secondary:#5b6475;--cds-dur-slow:.3s;
+ --s0:#2a6fdb;--s1:#e07b00;--s2:#2a9d8f;--s3:#8e5bd0;--s4:#c2447a;--s5:#6a8f1f;--s6:#a3702a;--s7:#4b5563;
+ color-scheme:light}
+@media (prefers-color-scheme:dark){:root{
+ --color-fg:#e8ebf1;--color-fg-muted:#9aa4b5;--color-bg:#14171d;--color-panel:#1c2028;--color-border-line:#2c333f;--color-bad:#ef6a5a;
+ --cds-chart-muted:#4a5365;--cds-chart-grid:#2a303b;--cds-chart-reference:#7b8598;
+ --cds-surface-popover:#242a35;--cds-border:#3a4252;--cds-shadow-popover:0 4px 14px rgba(0,0,0,.5);--cds-text-secondary:#9aa4b5;
+ --s0:#6ea2ff;--s1:#ffa94d;--s2:#4cc9b8;--s3:#b99aff;--s4:#f07bb0;--s5:#9fcb4a;--s6:#d9a45c;--s7:#9aa4b5;color-scheme:dark}}
+html,body{margin:0}
+body{background:var(--color-bg);color:var(--color-fg);font-family:var(--font-anthropic-sans);padding:24px 16px 48px}
+.dash-skeleton{background:var(--color-border-line);border-radius:8px;opacity:.5}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+</head>
+<body>
+<div id="dash-root">
+<style>
+.lx{position:relative;max-width:1180px;margin-inline:auto;font-family:var(--font-anthropic-sans);color:var(--color-fg);display:flex;flex-direction:column;gap:var(--cds-gap-xl)}
+.lx *{box-sizing:border-box}
+.lx h1{font-family:var(--font-anthropic-serif);font-weight:400;font-size:var(--cds-font-size-title);margin:0;line-height:1.15;text-wrap:balance}
+.lx h2{font-size:var(--cds-font-size-heading);font-weight:var(--cds-font-weight-medium);margin:0}
+.lx h3{font-size:var(--cds-font-size-body);font-weight:var(--cds-font-weight-medium);margin:0}
+.lx p{margin:0;line-height:1.5}
+.lx .muted{color:var(--color-fg-muted)}
+.lx .cap{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted)}
+.lx .eyebrow{font-size:var(--cds-font-size-caption);letter-spacing:.06em;text-transform:uppercase;color:var(--color-fg-muted)}
+.lx-head{display:flex;flex-direction:column;gap:var(--cds-gap-sm)}
+.lx-head .lede{max-width:70ch}
+.lx b{font-weight:600;font-variant-numeric:tabular-nums}
+.lx-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,11rem),1fr));gap:var(--cds-gap-md)}
+.lx-kpi{background:var(--color-panel);border:1px solid var(--color-border-line);border-radius:var(--cds-radius);padding:var(--cds-pad-lg);display:flex;flex-direction:column;gap:var(--cds-gap-xs)}
+.lx-kpi .v{font-family:var(--font-anthropic-serif);font-size:var(--cds-font-size-title);font-weight:400;font-variant-numeric:tabular-nums}
+.lx-quad{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,18rem),1fr));gap:var(--cds-gap-md)}
+.lx-quad > div{border:1px solid var(--color-border-line);border-radius:var(--cds-radius);padding:var(--cds-pad-lg);display:flex;flex-direction:column;gap:var(--cds-gap-sm)}
+.lx-quad ul{margin:0;padding-left:1.1rem;display:flex;flex-direction:column;gap:var(--cds-gap-xs);line-height:1.4}
+.lx-sec{display:flex;flex-direction:column;gap:var(--cds-gap-md)}
+.lx-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,22rem),1fr));gap:var(--cds-gap-md)}
+.lx-card{background:var(--color-panel);border:1px solid var(--color-border-line);border-radius:var(--cds-radius);padding:var(--cds-pad-lg);display:flex;flex-direction:column;gap:var(--cds-gap-sm);min-width:0}
+.lx-card.wide{grid-column:1/-1}
+.lx-chart{width:100%;position:relative}
+.lx-chart svg{display:block;max-width:100%;height:auto;overflow:visible}
+.lx-chart svg text{font-family:var(--font-anthropic-sans);fill:var(--color-fg-muted);font-size:11px}
+.lx-chart svg text.dk{fill:var(--color-fg)}
+.lx-tip{position:absolute;z-index:5;pointer-events:none;background:var(--cds-surface-popover);border:1px solid var(--cds-border);border-radius:var(--cds-radius);box-shadow:var(--cds-shadow-popover);padding:var(--cds-pad-xs) var(--cds-pad-sm);font-size:var(--cds-font-size-caption);display:flex;flex-direction:column;gap:2px;white-space:nowrap}
+.lx-tip-t{color:var(--cds-text-secondary)}
+.lx-fail{display:flex;align-items:center;justify-content:center;gap:.5rem;min-height:inherit;color:var(--color-fg-muted);font-size:var(--cds-font-size-caption)}
+.lx-fail i{width:.375rem;height:.375rem;border-radius:50%;background:var(--color-bad);display:inline-block}
+.lx-conc{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,22rem),1fr));gap:var(--cds-gap-md)}
+.lx-conc ul{margin:0;padding-left:1.1rem;display:flex;flex-direction:column;gap:var(--cds-gap-sm);line-height:1.5}
+.lx [data-dash-source-state=refreshing]{opacity:.5;transition:opacity var(--cds-dur-slow)}
+.lx-foot{border-top:1px solid var(--color-border-line);padding-top:var(--cds-pad-md)}
+</style>
+
+<div class="lx" id="top">
+  <header class="lx-head">
+    <span class="eyebrow">Data 035 · Final case study · Adventure Works, 2020 to 2022</span>
+    <h1>Adventure Works sales and profit</h1>
+    <p class="lede muted">
+      Bikes bring in <b data-source="facts" data-field="bike_share" data-row="0">—</b> of sales, led by
+      <b data-source="facts" data-field="top_sub" data-row="0">—</b>
+      (<b data-source="facts" data-field="top_sub_sale" data-row="0">—</b>).
+      The sharpest monthly drop is <b data-source="facts" data-field="drop_month" data-row="0">—</b>,
+      down <b data-source="facts" data-field="drop_pct" data-row="0">—</b> on the month before.
+    </p>
+  </header>
+
+  <section class="lx-kpis" id="kpis" aria-label="Headline figures">
+    <div class="lx-kpi"><span class="cap">Sales, 2020 to 2022</span><span class="v" data-source="facts" data-field="sale" data-row="0">—</span><span class="cap">Order quantity × product price</span></div>
+    <div class="lx-kpi"><span class="cap">Profit, 2020 to 2022</span><span class="v" data-source="facts" data-field="profit" data-row="0">—</span><span class="cap">Order quantity × (price − cost)</span></div>
+    <div class="lx-kpi"><span class="cap">Profit margin</span><span class="v" data-source="facts" data-field="margin" data-row="0">—</span><span class="cap">Profit ÷ sales</span></div>
+    <div class="lx-kpi"><span class="cap">Bikes share of sales</span><span class="v" data-source="facts" data-field="bike_share" data-row="0">—</span><span class="cap">Of all categories</span></div>
+  </section>
+
+  <section class="lx-sec" id="requirements">
+    <h2>Requirement quadrant</h2>
+    <div class="lx-quad">
+      <div><span class="eyebrow">Audience</span><p>VP of Sales, VP of Marketing and VP of Product.</p></div>
+      <div><span class="eyebrow">Data</span><p>Adventure Works sales, products, customers and territories, up to 2022. Sales and profit are worked out per order line.</p></div>
+      <div>
+        <span class="eyebrow">Goal 1</span><h3>Examine products and their sales and profit</h3>
+        <ul><li>What are the sales and profits by category and subcategory?</li><li>What are the top and bottom selling products?</li><li>What are the sales and profit trends?</li></ul>
+      </div>
+      <div>
+        <span class="eyebrow">Goal 2</span><h3>Examine sales and customer demographics</h3>
+        <ul><li>What are the sales by country?</li><li>What are the sales by occupation?</li><li>What are the sales by income range?</li></ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="lx-sec" id="goal1">
+    <h2>Goal 1: products, sales and profit</h2>
+    <div class="lx-grid">
+      <div class="lx-card wide">
+        <h3>Sales and profit by category and subcategory</h3>
+        <p class="cap">Box size shows sales. Hover a box for its profit. Colour shows category.</p>
+        <div class="lx-chart" id="ch-tree" data-source="category_sub" style="min-height:340px"><div class="dash-skeleton" style="height:340px"></div></div>
+      </div>
+      <div class="lx-card">
+        <h3>Top 10 product models by sales</h3>
+        <p class="cap">Hover a bar for profit.</p>
+        <div class="lx-chart" id="ch-top" data-source="top10" style="min-height:300px"><div class="dash-skeleton" style="height:300px"></div></div>
+      </div>
+      <div class="lx-card">
+        <h3>Bottom 10 product models by sales</h3>
+        <p class="cap">Hover a bar for profit.</p>
+        <div class="lx-chart" id="ch-bottom" data-source="bottom10" style="min-height:300px"><div class="dash-skeleton" style="height:300px"></div></div>
+      </div>
+      <div class="lx-card wide">
+        <h3>Sales and profit by month</h3>
+        <p class="cap">The dashed line marks the largest month-on-month fall in sales.</p>
+        <div class="lx-chart" id="ch-trend" data-source="monthly facts" style="min-height:320px"><div class="dash-skeleton" style="height:320px"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="lx-sec" id="goal2">
+    <h2>Goal 2: sales and customer demographics</h2>
+    <div class="lx-grid">
+      <div class="lx-card">
+        <h3>Sales by country</h3>
+        <p class="cap">Hover a bar for profit.</p>
+        <div class="lx-chart" id="ch-country" data-source="country" style="min-height:220px"><div class="dash-skeleton" style="height:220px"></div></div>
+      </div>
+      <div class="lx-card">
+        <h3>Sales by income range</h3>
+        <p class="cap">Annual household income of the buying customer. Hover a column for customer count.</p>
+        <div class="lx-chart" id="ch-income" data-source="income" style="min-height:260px"><div class="dash-skeleton" style="height:260px"></div></div>
+      </div>
+      <div class="lx-card wide">
+        <h3>Sales by occupation and category</h3>
+        <p class="cap">Each bar splits an occupation's sales by product category.</p>
+        <div class="lx-chart" id="ch-occ" data-source="occupation" style="min-height:260px"><div class="dash-skeleton" style="height:260px"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="lx-sec" id="conclusion">
+    <h2>Conclusion and key takeaways</h2>
+    <div class="lx-conc">
+      <div class="lx-card">
+        <h3>Conclusion</h3>
+        <p>The analysis shows clear differences between categories and product models. Some segments deliver strong profit and should stay the focus, while others are chances to improve. Concentrating on the top performers and optimizing the low performers supports steady profit growth across the portfolio.</p>
+      </div>
+      <div class="lx-card">
+        <h3>Key takeaways</h3>
+        <ul>
+          <li>Bikes dominate: <b data-source="facts" data-field="bike_share" data-row="0">—</b> of sales, with <b data-source="facts" data-field="top_sub" data-row="0">—</b> the largest subcategory.</li>
+          <li>The <b data-source="facts" data-field="mid_band" data-row="0">—</b> income range buys the most (<b data-source="facts" data-field="mid_share" data-row="0">—</b> of sales). More income does not mean more purchases.</li>
+          <li><b data-source="facts" data-field="top_country" data-row="0">—</b> is the largest market, with <b data-source="facts" data-field="top_country_share" data-row="0">—</b> of sales.</li>
+          <li>Sales drop sharply in <b data-source="facts" data-field="drop_month" data-row="0">—</b>. The data does not say why, so confirm the export is complete for the later months before presenting this as a real decline.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <footer class="lx-foot cap">Group project with Marissa. Kyrylo Tsyrulik built the Goal 1 charts in Tableau and Marissa built the Goal 2 charts; this web version of all six was rebuilt from the same data. Sales = order quantity × product price. Profit = order quantity × (product price − product cost). Figures are aggregated from the Adventure Works dataset used in the course.</footer>
+
+  <div class="lx-tip" hidden></div>
+</div>
+
+
+<script>
+/* Small stand-in for the data layer the page was written against. Data is the six CSV files in /data, embedded here so the page works offline. */
+window.dash=(function(){
+  var RAW={"category_sub":[{"category":"Accessories","subcategory":"Bike Racks","sale":"36240","profit":"22686"},{"category":"Accessories","subcategory":"Bike Stands","sale":"37206","profit":"23291"},{"category":"Accessories","subcategory":"Bottles and Cages","sale":"107745","profit":"67448"},{"category":"Accessories","subcategory":"Cleaners","sale":"13563","profit":"8490"},{"category":"Accessories","subcategory":"Fenders","sale":"87041","profit":"54488"},{"category":"Accessories","subcategory":"Helmets","sale":"205834","profit":"131036"},{"category":"Accessories","subcategory":"Hydration Packs","sale":"38218","profit":"23924"},{"category":"Accessories","subcategory":"Tires and Tubes","sale":"380827","profit":"238396"},{"category":"Bikes","subcategory":"Mountain Bikes","sale":"8583748","profit":"3930662"},{"category":"Bikes","subcategory":"Road Bikes","sale":"11287183","profit":"4368347"},{"category":"Bikes","subcategory":"Touring Bikes","sale":"3771565","profit":"1427160"},{"category":"Clothing","subcategory":"Caps","sale":"35882","profit":"12200"},{"category":"Clothing","subcategory":"Gloves","sale":"62261","profit":"36578"},{"category":"Clothing","subcategory":"Jerseys","sale":"158565","profit":"44956"},{"category":"Clothing","subcategory":"Shorts","sale":"66071","profit":"41360"},{"category":"Clothing","subcategory":"Socks","sale":"9556","profit":"5982"},{"category":"Clothing","subcategory":"Vests","sale":"33084","profit":"20710"}],"models":[{"model":"All-Purpose Bike Stand","sale":"37206","profit":"23291"},{"model":"Bike Wash","sale":"13563","profit":"8490"},{"model":"Classic Vest","sale":"33084","profit":"20710"},{"model":"Cycling Cap","sale":"35882","profit":"12200"},{"model":"Fender Set - Mountain","sale":"87041","profit":"54488"},{"model":"HL Mountain Tire","sale":"45675","profit":"28593"},{"model":"HL Road Tire","sale":"25917","profit":"16224"},{"model":"Half-Finger Gloves","sale":"62261","profit":"36578"},{"model":"Hitch Rack - 4-Bike","sale":"36240","profit":"22686"},{"model":"Hydration Pack","sale":"38218","profit":"23924"},{"model":"LL Mountain Tire","sale":"38984","profit":"24404"},{"model":"LL Road Tire","sale":"40917","profit":"25614"},{"model":"Long-Sleeve Logo Jersey","sale":"77148","profit":"26230"},{"model":"ML Mountain Tire","sale":"63549","profit":"39781"},{"model":"ML Road Tire","sale":"43058","profit":"26954"},{"model":"Mountain Bottle Cage","sale":"38062","profit":"23827"},{"model":"Mountain Tire Tube","sale":"28333","profit":"17736"},{"model":"Mountain-100","sale":"741623","profit":"324534"},{"model":"Mountain-200","sale":"7170946","profit":"3301096"},{"model":"Mountain-400-W","sale":"410138","profit":"186396"},{"model":"Mountain-500","sale":"261040","profit":"118635"},{"model":"Patch kit","sale":"13506","profit":"8455"},{"model":"Racing Socks","sale":"9556","profit":"5982"},{"model":"Road Bottle Cage","sale":"29928","profit":"18735"},{"model":"Road Tire Tube","sale":"17265","profit":"10808"},{"model":"Road-150","sale":"2905555","profit":"1142464"},{"model":"Road-250","sale":"4200817","profit":"1640671"},{"model":"Road-350-W","sale":"1549602","profit":"563435"},{"model":"Road-550-W","sale":"1358594","profit":"536123"},{"model":"Road-650","sale":"504749","profit":"206457"},{"model":"Road-750","sale":"767866","profit":"279196"},{"model":"Short-Sleeve Classic Jersey","sale":"81417","profit":"18726"},{"model":"Sport-100","sale":"205834","profit":"131036"},{"model":"Touring Tire","sale":"49950","profit":"31268"},{"model":"Touring Tire Tube","sale":"13673","profit":"8559"},{"model":"Touring-1000","sale":"2939558","profit":"1112329"},{"model":"Touring-2000","sale":"438561","profit":"165951"},{"model":"Touring-3000","sale":"393446","profit":"148880"},{"model":"Water Bottle","sale":"39755","profit":"24887"},{"model":"Women's Mountain Shorts","sale":"66071","profit":"41360"}],"monthly":[{"month":"2020-01","sale":"550911","profit":"222361"},{"month":"2020-02","sale":"475044","profit":"189616"},{"month":"2020-03","sale":"644930","profit":"259609"},{"month":"2020-04","sale":"627113","profit":"252370"},{"month":"2020-05","sale":"564092","profit":"228243"},{"month":"2020-06","sale":"620323","profit":"250925"},{"month":"2020-07","sale":"509533","profit":"206697"},{"month":"2020-08","sale":"570742","profit":"232614"},{"month":"2020-09","sale":"370207","profit":"151065"},{"month":"2020-10","sale":"433134","profit":"179653"},{"month":"2020-11","sale":"446772","profit":"183243"},{"month":"2020-12","sale":"592131","profit":"245206"},{"month":"2021-01","sale":"537202","profit":"225082"},{"month":"2021-02","sale":"593115","profit":"252107"},{"month":"2021-03","sale":"587867","profit":"249941"},{"month":"2021-04","sale":"592383","profit":"248957"},{"month":"2021-05","sale":"621314","profit":"266141"},{"month":"2021-06","sale":"623061","profit":"264691"},{"month":"2021-07","sale":"818742","profit":"344327"},{"month":"2021-08","sale":"854531","profit":"368002"},{"month":"2021-09","sale":"887720","profit":"380838"},{"month":"2021-10","sale":"866984","profit":"371502"},{"month":"2021-11","sale":"1007803","profit":"429097"},{"month":"2021-12","sale":"1333482","profit":"566399"},{"month":"2022-01","sale":"1160733","profit":"490488"},{"month":"2022-02","sale":"992428","profit":"421537"},{"month":"2022-03","sale":"1145784","profit":"487331"},{"month":"2022-04","sale":"1220247","profit":"514585"},{"month":"2022-05","sale":"1381718","profit":"584415"},{"month":"2022-06","sale":"1431074","profit":"604451"},{"month":"2022-07","sale":"358170","profit":"150274"},{"month":"2022-08","sale":"312974","profit":"132775"},{"month":"2022-09","sale":"297053","profit":"125122"},{"month":"2022-10","sale":"286830","profit":"122675"},{"month":"2022-11","sale":"296417","profit":"127583"},{"month":"2022-12","sale":"302022","profit":"127791"}],"country":[{"country":"Australia","sale":"7416456","profit":"3077023"},{"country":"Canada","sale":"1769246","profit":"757844"},{"country":"France","sale":"2362643","profit":"989346"},{"country":"Germany","sale":"2524680","profit":"1054186"},{"country":"United Kingdom","sale":"2902562","profit":"1214774"},{"country":"United States","sale":"7938999","profit":"3364542"}],"occupation":[{"occupation":"Clerical","category":"Accessories","sale":"134108"},{"occupation":"Clerical","category":"Bikes","sale":"3800497"},{"occupation":"Clerical","category":"Clothing","sale":"53766"},{"occupation":"Management","category":"Accessories","sale":"163196"},{"occupation":"Management","category":"Bikes","sale":"4398700"},{"occupation":"Management","category":"Clothing","sale":"63031"},{"occupation":"Manual","category":"Accessories","sale":"107328"},{"occupation":"Manual","category":"Bikes","sale":"2318373"},{"occupation":"Manual","category":"Clothing","sale":"38377"},{"occupation":"Professional","category":"Accessories","sale":"289264"},{"occupation":"Professional","category":"Bikes","sale":"8060850"},{"occupation":"Professional","category":"Clothing","sale":"116054"},{"occupation":"Skilled Manual","category":"Accessories","sale":"212778"},{"occupation":"Skilled Manual","category":"Bikes","sale":"5064076"},{"occupation":"Skilled Manual","category":"Clothing","sale":"94191"}],"income":[{"income_band":"Up to 30K","sale":"5386393","customers":"4922"},{"income_band":"30-50K","sale":"4321630","customers":"3196"},{"income_band":"50-70K","sale":"7259507","customers":"5143"},{"income_band":"70-90K","sale":"3834648","customers":"2084"},{"income_band":"90-110K","sale":"1776055","customers":"981"},{"income_band":"110K+","sale":"2336353","customers":"1090"}]};
+  var calcs={},cbs=[];
+  function data(id){ if(id in calcs) return {status:'ok',data:calcs[id]}; if(RAW[id]) return {status:'ok',data:RAW[id]}; return {status:'missing',data:[]}; }
+  window.addEventListener('resize',function(){cbs.forEach(function(f){f();});});
+  return {
+    data:data,
+    colors:['var(--s0)','var(--s1)','var(--s2)','var(--s3)','var(--s4)','var(--s5)','var(--s6)','var(--s7)'],
+    calc:function(id,o){ calcs[id]=o.fn.apply(null,o.inputs.map(function(i){return data(i).data;})); },
+    onData:function(fn){ cbs.push(fn); fn(); },
+    params:function(){return {};}
+  };
+})();
+</script>
+<script>
+(function () {
+  const root = document.querySelector('.lx');
+  const tip = root.querySelector('.lx-tip');
+  const compact = new Intl.NumberFormat('en', {notation: 'compact', maximumFractionDigits: 1});
+  const fmtM = (v) => '$' + compact.format(v);
+  const fmtF = (v) => '$' + d3.format(',.0f')(v);
+  const fmtP = (v) => d3.format('.1%')(v);
+  const mFmt = d3.utcFormat('%b %Y');
+  const N = Number;
+  const MUTED = 'var(--cds-chart-muted)';
+
+  const catColor = (cat) => {
+    const names = ['Bikes', 'Accessories', 'Clothing', 'Components'];
+    const i = names.indexOf(cat);
+    return dash.colors[i < 0 ? 4 : i];
+  };
+
+  function showTip(ev, title, lines) {
+    tip.replaceChildren();
+    const t = document.createElement('div');
+    t.className = 'lx-tip-t';
+    t.textContent = title;
+    tip.append(t);
+    lines.forEach((l) => { const d = document.createElement('div'); d.textContent = l; tip.append(d); });
+    tip.hidden = false;
+    const r = root.getBoundingClientRect();
+    let x = ev.clientX - r.left + 14;
+    const w = tip.offsetWidth;
+    if (x + w > r.width) x = ev.clientX - r.left - w - 14;
+    tip.style.left = Math.max(0, x) + 'px';
+    tip.style.top = (ev.clientY - r.top + 14) + 'px';
+  }
+  const hideTip = () => { tip.hidden = true; };
+
+  function mk(el, h) {
+    el.replaceChildren();
+    const w = el.clientWidth;
+    if (!w) return null;
+    const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', '0 0 ' + w + ' ' + h);
+    return {svg, w, h};
+  }
+  function textW(svg, texts) {
+    const t = svg.append('text').attr('opacity', 0);
+    let m = 0;
+    texts.forEach((s) => { t.text(s); m = Math.max(m, t.node().getComputedTextLength()); });
+    t.remove();
+    return m;
+  }
+  function state(el, id) {
+    const s = dash.data(id).status;
+    if (s === 'ok') return true;
+    if (s === 'error' || s === 'connect' || s === 'declined' || s === 'missing') {
+      el.replaceChildren();
+      const f = document.createElement('div');
+      f.className = 'lx-fail';
+      f.style.minHeight = el.style.minHeight;
+      const i = document.createElement('i');
+      f.append(i, document.createTextNode('Failed to load'));
+      el.append(f);
+    }
+    return false;
+  }
+
+  // ---- calculations ----
+  dash.calc('facts', {
+    inputs: ['category_sub', 'monthly', 'country', 'income'],
+    title: 'Headline figures',
+    description: 'Totals, shares and the largest monthly fall, worked out from the aggregated sales tables.',
+    fn: (category_sub, monthly, country, income) => {
+      const n = Number;
+      const sum = (rows, k) => rows.reduce((s, r) => s + n(r[k]), 0);
+      const sale = sum(monthly, 'sale');
+      const profit = sum(monthly, 'profit');
+      const bikes = sum(category_sub.filter((r) => r.category === 'Bikes'), 'sale');
+      const topSub = category_sub.slice().sort((a, b) => n(b.sale) - n(a.sale))[0];
+      let drop = {pct: 0, month: ''};
+      for (let i = 1; i < monthly.length; i++) {
+        const pct = (n(monthly[i].sale) - n(monthly[i - 1].sale)) / n(monthly[i - 1].sale);
+        if (pct < drop.pct) drop = {pct, month: monthly[i].month};
+      }
+      const topC = country.slice().sort((a, b) => n(b.sale) - n(a.sale))[0];
+      const topI = income.slice().sort((a, b) => n(b.sale) - n(a.sale))[0];
+      return [{
+        sale, profit, margin: profit / sale, bike_share: bikes / sale,
+        top_sub: topSub.subcategory, top_sub_sale: n(topSub.sale),
+        drop_month: drop.month, drop_pct: -drop.pct,
+        top_country: topC.country, top_country_share: n(topC.sale) / sale,
+        mid_band: topI.income_band, mid_share: n(topI.sale) / sum(income, 'sale')
+      }];
+    }
+  });
+  dash.calc('top10', {
+    inputs: ['models'],
+    title: 'Top 10 models',
+    description: 'The ten product models with the highest sales.',
+    fn: (models) => models.map((r) => ({model: r.model, sale: Number(r.sale), profit: Number(r.profit)})).sort((a, b) => b.sale - a.sale).slice(0, 10)
+  });
+  dash.calc('bottom10', {
+    inputs: ['models'],
+    title: 'Bottom 10 models',
+    description: 'The ten product models with the lowest sales.',
+    fn: (models) => models.map((r) => ({model: r.model, sale: Number(r.sale), profit: Number(r.profit)})).sort((a, b) => a.sale - b.sale).slice(0, 10)
+  });
+
+  // ---- chart helpers ----
+  function hbars(el, rows, o) {
+    const row = 28, h = rows.length * row + 8;
+    const c = mk(el, h);
+    if (!c) return;
+    const {svg, w} = c;
+    const lw = textW(svg, rows.map((r) => r.label)) + 10;
+    const vw = textW(svg, rows.map((r) => fmtM(r.value))) + 8;
+    const x = d3.scaleLinear([0, d3.max(rows, (r) => r.value) || 1], [0, Math.max(10, w - lw - vw)]);
+    const g = svg.append('g');
+    rows.forEach((r, i) => {
+      const y = i * row + 4;
+      g.append('text').attr('x', lw - 8).attr('y', y + 14).attr('text-anchor', 'end').attr('class', 'dk').text(r.label);
+      g.append('rect').attr('x', lw).attr('y', y + 3).attr('width', Math.max(2, x(r.value))).attr('height', 16).attr('rx', 4)
+        .style('fill', o.color(r, i));
+      g.append('text').attr('x', lw + Math.max(2, x(r.value)) + 6).attr('y', y + 14).text(fmtM(r.value));
+      g.append('rect').attr('x', 0).attr('y', y).attr('width', w).attr('height', row - 2).attr('fill', 'transparent')
+        .on('mousemove', (ev) => showTip(ev, r.label, r.tip)).on('mouseleave', hideTip);
+    });
+  }
+
+  function drawTree(el) {
+    const rows = dash.data('category_sub').data.map((r) => ({category: r.category, name: r.subcategory, sale: N(r.sale), profit: N(r.profit)}));
+    const h = 340;
+    const c = mk(el, h);
+    if (!c) return;
+    const {svg, w} = c;
+    const cats = d3.groups(rows, (r) => r.category).map(([k, v]) => ({name: k, children: v}));
+    const hier = d3.hierarchy({children: cats}).sum((d) => d.sale || 0).sort((a, b) => b.value - a.value);
+    d3.treemap().size([w, h]).padding(2).round(true)(hier);
+    const g = svg.selectAll('g.leaf').data(hier.leaves()).join('g').attr('transform', (d) => 'translate(' + d.x0 + ',' + d.y0 + ')');
+    g.append('rect').attr('width', (d) => Math.max(0, d.x1 - d.x0)).attr('height', (d) => Math.max(0, d.y1 - d.y0)).attr('rx', 4)
+      .style('fill', (d) => catColor(d.data.category)).style('fill-opacity', 0.35).style('stroke', (d) => catColor(d.data.category))
+      .on('mousemove', (ev, d) => showTip(ev, d.data.name + ' (' + d.data.category + ')', ['Sales ' + fmtF(d.data.sale), 'Profit ' + fmtF(d.data.profit)]))
+      .on('mouseleave', hideTip);
+    g.each(function (d) {
+      const bw = d.x1 - d.x0, bh = d.y1 - d.y0;
+      if (bw < 70 || bh < 34) return;
+      const s = d3.select(this);
+      s.append('text').attr('class', 'dk').attr('x', 8).attr('y', 18).style('pointer-events', 'none').text(d.data.name);
+      s.append('text').attr('x', 8).attr('y', 33).style('pointer-events', 'none').text(fmtM(d.data.sale));
+    });
+  }
+
+  function drawTrend(el) {
+    const rows = dash.data('monthly').data.map((r) => ({d: d3.utcParse('%Y-%m')(r.month), sale: N(r.sale), profit: N(r.profit)}));
+    const f = dash.data('facts').data[0];
+    const h = 320;
+    const c = mk(el, h);
+    if (!c) return;
+    const {svg, w} = c;
+    const yScale = d3.scaleLinear([0, d3.max(rows, (r) => r.sale) * 1.18]).nice(4);
+    const yMax = yScale.domain()[1];
+    const yt = yScale.ticks(4);
+    const l = textW(svg, yt.map(fmtM)) + 12, rr = 52, t = 10, b = 26;
+    const x = d3.scaleUtc(d3.extent(rows, (r) => r.d), [l, w - rr]);
+    const y = d3.scaleLinear([0, yMax], [h - b, t]);
+    svg.append('g').selectAll('line').data(yt).join('line').attr('x1', l).attr('x2', w - rr).attr('y1', (v) => y(v)).attr('y2', (v) => y(v)).style('stroke', 'var(--cds-chart-grid)');
+    svg.append('g').selectAll('text').data(yt).join('text').attr('x', l - 6).attr('y', (v) => y(v) + 4).attr('text-anchor', 'end').text(fmtM);
+    const ticks = x.ticks(d3.utcMonth.every(w < 560 ? 12 : 6));
+    svg.append('g').selectAll('text').data(ticks).join('text').attr('x', (d) => x(d)).attr('y', h - 6).attr('text-anchor', 'middle').text(mFmt);
+    const series = [['sale', dash.colors[0], 'Sales'], ['profit', dash.colors[1], 'Profit']];
+    series.forEach(([k, col, name]) => {
+      const line = d3.line().x((r) => x(r.d)).y((r) => y(r[k]));
+      svg.append('path').attr('d', line(rows)).attr('fill', 'none').attr('stroke-width', 2).attr('stroke-linecap', 'round').attr('stroke-linejoin', 'round').style('stroke', col);
+      const last = rows[rows.length - 1];
+      svg.append('text').attr('x', x(last.d) + 6).attr('y', y(last[k]) + 4).attr('class', 'dk').text(name);
+    });
+    const dm = d3.utcParse('%Y-%m')(f.drop_month);
+    if (dm) {
+      svg.append('line').attr('x1', x(dm)).attr('x2', x(dm)).attr('y1', t).attr('y2', h - b).attr('stroke-dasharray', '4 4').style('stroke', 'var(--cds-chart-reference)');
+      svg.append('text').attr('x', x(dm) - 6).attr('y', t + 10).attr('text-anchor', 'end').text('Largest fall: ' + mFmt(dm));
+    }
+    const dot = svg.append('g').attr('display', 'none');
+    series.forEach(([k, col]) => dot.append('circle').attr('class', 'dot-' + k).attr('r', 4).style('fill', col));
+    const bis = d3.bisector((r) => r.d).center;
+    svg.append('rect').attr('x', l).attr('y', t).attr('width', w - rr - l).attr('height', h - b - t).attr('fill', 'transparent')
+      .on('mousemove', (ev) => {
+        const px = ev.clientX - svg.node().getBoundingClientRect().left;
+        const r = rows[bis(rows, x.invert(px * (w / svg.node().getBoundingClientRect().width)))];
+        dot.attr('display', null);
+        series.forEach(([k]) => dot.select('.dot-' + k).attr('cx', x(r.d)).attr('cy', y(r[k])));
+        showTip(ev, mFmt(r.d), ['Sales ' + fmtF(r.sale), 'Profit ' + fmtF(r.profit)]);
+      })
+      .on('mouseleave', () => { dot.attr('display', 'none'); hideTip(); });
+  }
+
+  function drawIncome(el) {
+    const rows = dash.data('income').data.map((r) => ({band: r.income_band, sale: N(r.sale), cust: N(r.customers)}));
+    const best = d3.max(rows, (r) => r.sale);
+    const h = 260;
+    const c = mk(el, h);
+    if (!c) return;
+    const {svg, w} = c;
+    const l = 4, t = 22, b = 24;
+    const x = d3.scaleBand(rows.map((r) => r.band), [l, w - 4]).padding(0.25);
+    const y = d3.scaleLinear([0, best], [h - b, t]);
+    rows.forEach((r) => {
+      svg.append('rect').attr('x', x(r.band)).attr('y', y(r.sale)).attr('width', x.bandwidth()).attr('height', h - b - y(r.sale)).attr('rx', 4)
+        .style('fill', r.sale === best ? dash.colors[0] : MUTED)
+        .on('mousemove', (ev) => showTip(ev, r.band + ' a year', ['Sales ' + fmtF(r.sale), d3.format(',')(r.cust) + ' customers'])).on('mouseleave', hideTip);
+      svg.append('text').attr('x', x(r.band) + x.bandwidth() / 2).attr('y', y(r.sale) - 6).attr('text-anchor', 'middle').attr('class', 'dk').text(fmtM(r.sale));
+      svg.append('text').attr('x', x(r.band) + x.bandwidth() / 2).attr('y', h - 6).attr('text-anchor', 'middle').text(r.band);
+    });
+  }
+
+  function drawOcc(el) {
+    const raw = dash.data('occupation').data.map((r) => ({occ: r.occupation, cat: r.category, sale: N(r.sale)}));
+    const cats = Array.from(new Set(raw.map((r) => r.cat)));
+    const occs = d3.groups(raw, (r) => r.occ).map(([occ, v]) => {
+      const o = {occ, total: d3.sum(v, (r) => r.sale)};
+      cats.forEach((cname) => { o[cname] = d3.sum(v.filter((r) => r.cat === cname), (r) => r.sale); });
+      return o;
+    }).sort((a, b) => b.total - a.total);
+    const row = 34, top = 26, h = occs.length * row + top + 4;
+    const c = mk(el, h);
+    if (!c) return;
+    const {svg, w} = c;
+    const lw = textW(svg, occs.map((o) => o.occ)) + 10;
+    const vw = textW(svg, occs.map((o) => fmtM(o.total))) + 8;
+    const x = d3.scaleLinear([0, d3.max(occs, (o) => o.total)], [0, Math.max(10, w - lw - vw)]);
+    let lx = 0;
+    cats.forEach((cname) => {
+      svg.append('rect').attr('x', lx).attr('y', 4).attr('width', 10).attr('height', 10).attr('rx', 2).style('fill', catColor(cname));
+      const tx = svg.append('text').attr('x', lx + 15).attr('y', 13).text(cname);
+      lx += 15 + tx.node().getComputedTextLength() + 18;
+    });
+    occs.forEach((o, i) => {
+      const y = top + i * row;
+      svg.append('text').attr('x', lw - 8).attr('y', y + 16).attr('text-anchor', 'end').attr('class', 'dk').text(o.occ);
+      let x0 = 0;
+      cats.forEach((cname) => {
+        const wd = x(o[cname]);
+        if (wd <= 0) return;
+        svg.append('rect').attr('x', lw + x0).attr('y', y + 4).attr('width', Math.max(1, wd)).attr('height', 18).style('fill', catColor(cname))
+          .on('mousemove', (ev) => showTip(ev, o.occ + ' · ' + cname, ['Sales ' + fmtF(o[cname])])).on('mouseleave', hideTip);
+        x0 += wd;
+      });
+      svg.append('text').attr('x', lw + x0 + 6).attr('y', y + 17).text(fmtM(o.total));
+    });
+  }
+
+  function fill() {
+    const s = dash.data('facts');
+    document.querySelectorAll('.lx [data-source="facts"][data-field]').forEach((el) => {
+      if (s.status !== 'ok') return;
+      const f = el.dataset.field;
+      const v = s.data[0][f];
+      let t = String(v);
+      if (f === 'sale' || f === 'profit' || f === 'top_sub_sale') t = fmtM(v);
+      else if (f === 'margin' || f === 'bike_share' || f === 'top_country_share' || f === 'mid_share' || f === 'drop_pct') t = fmtP(v);
+      else if (f === 'drop_month') t = mFmt(d3.utcParse('%Y-%m')(v));
+      else if (f === 'mid_band') t = v + ' a year';
+      el.textContent = t;
+    });
+  }
+
+  dash.onData(() => {
+    fill();
+    const q = (id) => document.getElementById(id);
+    if (state(q('ch-tree'), 'category_sub')) drawTree(q('ch-tree'));
+    if (state(q('ch-top'), 'top10')) {
+      hbars(q('ch-top'), dash.data('top10').data.map((r) => ({label: r.model, value: r.sale, tip: ['Sales ' + fmtF(r.sale), 'Profit ' + fmtF(r.profit)]})), {color: () => dash.colors[0]});
+    }
+    if (state(q('ch-bottom'), 'bottom10')) {
+      hbars(q('ch-bottom'), dash.data('bottom10').data.map((r) => ({label: r.model, value: r.sale, tip: ['Sales ' + fmtF(r.sale), 'Profit ' + fmtF(r.profit)]})), {color: () => dash.colors[2]});
+    }
+    if (state(q('ch-trend'), 'monthly') && dash.data('facts').status === 'ok') drawTrend(q('ch-trend'));
+    if (state(q('ch-country'), 'country')) {
+      const rows = dash.data('country').data.map((r) => ({label: r.country, value: N(r.sale), tip: ['Sales ' + fmtF(N(r.sale)), 'Profit ' + fmtF(N(r.profit))]})).sort((a, b) => b.value - a.value);
+      hbars(q('ch-country'), rows, {color: (r, i) => (i === 0 ? dash.colors[0] : MUTED)});
+    }
+    if (state(q('ch-income'), 'income')) drawIncome(q('ch-income'));
+    if (state(q('ch-occ'), 'occupation')) drawOcc(q('ch-occ'));
+  });
+})();
+</script>
+
+</div>
+</body>
+</html>
