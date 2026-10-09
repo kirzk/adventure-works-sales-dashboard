@@ -345,7 +345,7 @@ window.dash=(function(){
     const c = mk(el, h);
     if (!c) return;
     const {svg, w} = c;
-    const yScale = d3.scaleLinear([0, d3.max(rows, (r) => r.sale) * 1.18]).nice(4);
+    const yScale = d3.scaleLinear().domain([0, d3.max(rows, (r) => r.sale) * 1.18]).nice(4);
     const yMax = yScale.domain()[1];
     const yt = yScale.ticks(4);
     const l = textW(svg, yt.map(fmtM)) + 12, rr = 52, t = 10, b = 26;
