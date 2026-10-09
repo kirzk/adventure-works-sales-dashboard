@@ -2,7 +2,7 @@
 
 Final case study for **Data 035: Data Storytelling and Visualization** at the Southern Alberta Institute of Technology (SAIT).
 
-**Live dashboard:** *(add your GitHub Pages link here after you turn Pages on)*
+**Live dashboard:** https://kirzk.github.io/adventure-works-sales-dashboard/
 
 ## Group project and my part
 
