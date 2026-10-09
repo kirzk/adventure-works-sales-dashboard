@@ -31,6 +31,38 @@ The Adventure Works sample dataset (sales, customers, products, categories, subc
 - Sales = order quantity × product price
 - Profit = order quantity × (product price − product cost)
 
+## Presentation slides
+
+These are the Tableau charts as we presented them in class.
+
+### Goal 1: products, sales and profit
+
+**Sales and profit by category and subcategory**
+
+![Sales and profit by category and subcategory](screenshots/01-sales-profit-by-category.png)
+
+**Top and bottom selling product models**
+
+![Top and bottom selling product models](screenshots/02-top-bottom-products.png)
+
+**Sales and profit trends over time**
+
+![Sales and profit trends over time](screenshots/03-sales-profit-trend.png)
+
+### Goal 2: sales and customer demographics
+
+**Sales by country**
+
+![Sales by country map](screenshots/04-sales-by-country.png)
+
+**Sales by occupation and category**
+
+![Sales by occupation and category](screenshots/05-sales-by-occupation.png)
+
+**Sales by annual income**
+
+![Sales by annual income](screenshots/06-sales-by-income.png)
+
 ## Key findings
 
 - Total sales are about **$24.9M** and profit about **$10.5M**, a margin of about **42%**.
@@ -46,6 +78,7 @@ The Adventure Works sample dataset (sales, customers, products, categories, subc
 | --- | --- |
 | `index.html` | The interactive dashboard (open it in a browser, or view it with GitHub Pages) |
 | `data/` | The six small summary tables the dashboard is drawn from (CSV) |
+| `screenshots/` | The chart slides from our class presentation |
 | `tableau/Final Case Study.twb` | The original Tableau workbook (Goal 1 charts). It needs `Advanture Dataset.xlsx` from the course to open. |
 
 ## Tools
